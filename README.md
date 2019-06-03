@@ -15,5 +15,5 @@ Pre-installs sample data for the demo.
  - Clone this repo and `cd` into it.
  - `lando start`
  - `cd frontend && lando yarn start`
- - Navigate to http:frontend.lndo.site
+ - Navigate to http://frontend.lndo.site
  - Get to work and make it your own.

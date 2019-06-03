@@ -1,0 +1,89 @@
+# Rename this file to .lando.yml to use, or delete if you already have one.
+# Named start.lando.yml to not conflict with projects installed with lando mw install.
+
+# project_code: cmm, apb_d7, etc.
+name: headless
+
+# drupal8
+recipe: drupal8
+
+config:
+  # default: web | lightning: docroot
+  webroot: backend/web
+  php: '7.2'
+
+proxy:
+  appserver:
+    - backend.headless.lndo.site
+  nodejs:
+    - frontend.lndo.site:3333
+
+  # Optionally activate xdebug
+  #
+  # If you are having trouble getting xdebug to work please see:
+  # https://docs.devwithlando.io/services/php.html#using-xdebug
+  # xdebug: true
+
+# Additional services and features.
+services:
+  appserver:
+    run:
+      - /bin/sh -c "cd /app/backend; composer install"
+      - /bin/sh -c "cd /app/backend/web; drush --root=/app/backend/web site-install standard --site-name=headless-drupal --db-url=mysql://drupal8:drupal8@database/drupal8 -y"
+      - /bin/sh -c "cd /app/backend/web; drush --root=/app/backend/web en jsonapi jsonapi_extras devel devel_generate serialization -y"
+      - /bin/sh -c "cd /app/backend/web; drush genc 5 --types=article"
+  nodejs:
+    type: node:10
+    run:
+      - /bin/sh -c "cd /app/frontend && yarn install"
+      - /bin/sh -c "echo; echo You should 'cd frontend' and run 'yarn start'"
+    port: 3333
+    overrides:
+      ports:
+        - 3333:3333
+
+# Custom Lando commands
+tooling:
+  build:
+    service: appserver
+    description: "Build the project. \n  -c Clean build. \n  -l (live) Build production code. composer install --no-dev \n -t Theme build \n  -w Run theme watcher \n  -y Confirm prompts."
+    cmd:
+      - /app/backend/scripts/build.sh
+      - -c
+  build:reset:
+    service: appserver
+    description: "Run local-dev script. (updb, cim, cr, uli)"
+    cmd:
+      - /app/backend/scripts/reset.sh
+  build:theme:
+    service: nodejs
+    description: "Compile the theme."
+    cmd:
+      - /app/backend/scripts/build.sh
+      - -t
+  gulp:
+    service: nodejs
+  node:
+    service: nodejs
+  npm:
+    service: nodejs
+  yarn:
+    service: nodejs
+  test:phpunit:
+    service: appserver
+    description: "Run PHP Unit tests: lando phpunit"
+    cmd:
+      - ./vendor/bin/phpunit
+  test:vrt:
+    service: nodejs
+    description: "Use: test:vrt [local|dev|stage|prod]:ref to create reference. test:vrt [local|dev|stage|prod] to run comparision tests."
+    cmd:
+      - npm
+      - run
+      - --prefix=/app/backend/tests/vrt
+  test:vrt:install:
+    service: nodejs
+    cmd:
+      - npm
+      - install
+      - /app/backend/tests/vrt

@@ -16,7 +16,7 @@ proxy:
   appserver:
     - backend.headless.lndo.site
   nodejs:
-    - frontend.lndo.site:3333
+    - headless.lndo.site:8080
 
   # Optionally activate xdebug
   #
@@ -30,17 +30,15 @@ services:
     run:
       - /bin/sh -c "cd /app/backend; composer install"
       - /bin/sh -c "cd /app/backend/web; drush --root=/app/backend/web site-install standard --site-name=headless-drupal --db-url=mysql://drupal8:drupal8@database/drupal8 -y"
-      - /bin/sh -c "cd /app/backend/web; drush --root=/app/backend/web en jsonapi jsonapi_extras devel devel_generate serialization -y"
-      - /bin/sh -c "cd /app/backend/web; drush genc 5 --types=article"
+      - /bin/sh -c "cd /app/backend/web; drush --root=/app/backend/web en jsonapi jsonapi_extras devel devel_generate serialization jwt jwt_auth_consumer jwt_auth_issuer getjwtonlogin -y"
+
   nodejs:
     type: node:10
-    run:
-      - /bin/sh -c "cd /app/frontend && yarn install"
-      - /bin/sh -c "echo; echo You should 'cd frontend' and run 'yarn start'"
-    port: 3333
+    build:
+      - /bin/sh -c "cd /app/frontend; npm install"
     overrides:
       ports:
-        - 3333:3333
+        - 8080:8080
 
 # Custom Lando commands
 tooling:
@@ -67,8 +65,9 @@ tooling:
     service: nodejs
   npm:
     service: nodejs
-  yarn:
+  front:start:
     service: nodejs
+    cmd: /bin/sh -c "cd /app/frontend && npm run start"
   test:phpunit:
     service: appserver
     description: "Run PHP Unit tests: lando phpunit"

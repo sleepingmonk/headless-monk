@@ -25,7 +25,9 @@
         "drupal/core": "~8.7",
         "drupal/diff": "^1.0@RC",
         "drupal/environment_indicator": "^3.2",
+        "drupal/getjwtonlogin": "^1.0",
         "drupal/jsonapi_extras": "^3.7",
+        "drupal/jwt": "^1.0@alpha",
         "drupal/masquerade": "^2.0",
         "drupal/metatag": "^1.4",
         "drush/drush": "~8.0|^9.0.0-beta8",
@@ -60,20 +62,21 @@
     "scripts": {
         "drupal-scaffold": "DrupalComposer\\DrupalScaffold\\Plugin::scaffold",
         "pre-install-cmd": [
-            "DrupalProject\\composer\\ScriptHandler::checkComposerVersion"
+            "DrupalProject\\composer\\ScriptHandler::checkComposerVersion",
+            "mkdir -p web/core"
         ],
         "pre-update-cmd": [
             "DrupalProject\\composer\\ScriptHandler::checkComposerVersion"
         ],
         "post-install-cmd": [
-            "DrupalProject\\composer\\ScriptHandler::createRequiredFiles",
             "DrupalProject\\composer\\ScriptHandler::postInstall",
+            "DrupalProject\\composer\\ScriptHandler::createRequiredFiles",
             "find ./vendor/ -type d -name .git | xargs rm -rf",
             "find ./web/ -type d -name .git | xargs rm -rf"
         ],
         "post-update-cmd": [
-            "DrupalProject\\composer\\ScriptHandler::createRequiredFiles",
             "DrupalProject\\composer\\ScriptHandler::postInstall",
+            "DrupalProject\\composer\\ScriptHandler::createRequiredFiles",
             "find ./vendor/ -type d -name .git | xargs rm -rf",
             "find ./web/ -type d -name .git | xargs rm -rf"
         ]

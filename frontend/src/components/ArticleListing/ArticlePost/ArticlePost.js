@@ -1,7 +1,6 @@
 import React, {Fragment} from 'react';
 import PropTypes from 'prop-types';
 import {hot} from "react-hot-loader";
-
 import Button from '../../Button/Button';
 
 const ArticlePost = ({title, summary, link, showPost, tags, images}) => {
@@ -15,7 +14,6 @@ const ArticlePost = ({title, summary, link, showPost, tags, images}) => {
               key={image.id}
               src={"http://backend.headless.lndo.site" + image.attributes.uri.url}
               alt="teaser image"
-              style={{maxWidth: '300px'}}
             />
           );
         })
